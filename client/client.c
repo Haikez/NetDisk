@@ -1,32 +1,8 @@
 #include <myfunc.h>
 #include "epollTools.h"
 #include "msg.h"
-typedef struct{
-    long len;
-    char data[1024];
-}train_t;
-
-void show_progress_bar(double progress) {
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    int bar_length = w.ws_col - 15; // 减去额外字符的长度（如百分比和旋转指示器）
-                                    //
-    char spinner[] = {'|', '/', '-', '\\'};
-    int spinner_index = (int)progress % 4;  // 动态改变旋转指示器
-
-    int fill_length = (int)(progress * bar_length / 100.0);
-    int empty_length = bar_length - fill_length;
-
-    printf("\r[");
-    for (int i = 0; i < fill_length; ++i) {
-        putchar('#');
-    }
-    for (int i = 0; i < empty_length; ++i) {
-        putchar('-');
-    }
-    printf("] %.2f%% %c", progress, spinner[spinner_index]);
-    fflush(stdout);  // 刷新输出缓冲区
-}
+#include "transFile.h"
+#include "showProcessBar.h"
 
 int main(int argc,char *argv[]){
     // ./client ip port
@@ -106,6 +82,18 @@ int main(int argc,char *argv[]){
                         }
                         printf("\n下载完成OK！\n");
                         continue;
+                    }
+                    if(strcmp(msg.cmd,"puts")==0){
+                        // 检查本地文件是否存在
+                        int ret = access(msg.rst,F_OK);
+                        if(ret != 0){ // 路径不存在
+                            char *rst=strerror(errno);
+                            printf("%s\n",rst);
+                            continue;
+                        }
+                        transFileShowProcess(msg.rst,sockfd);
+                        bzero(&msg,sizeof(msg));
+                        recv(sockfd, &msg, sizeof(msg), 0); // 接收服务器消息
                     }
                     if(strlen(msg.rst)){
                         printf("%s\n",msg.rst);

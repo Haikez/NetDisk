@@ -26,7 +26,7 @@ int checkCMD(threadPool_t *threadPool,char *str,int netfd){
     }else if(strcmp(cmd,"pwd")==0){
         handlePWD(threadPool,netfd);
     }else if(strcmp(cmd,"puts")==0){
-
+        handlePUTS(threadPool,path,netfd);
     }else if(strcmp(cmd,"gets")==0){
         handleGETS(threadPool,path,netfd);
     }else if(strcmp(cmd,"rm")==0){
@@ -38,6 +38,32 @@ int checkCMD(threadPool_t *threadPool,char *str,int netfd){
     }else{
         bzero(&msg,sizeof(msg));
         send(netfd,&msg,sizeof(msg),0);
+    }
+}
+int handlePUTS(const threadPool_t *threadPool,char *fileName,int netfd){
+    rstMsg_t msg;
+    bzero(&msg,sizeof(msg));
+    memcpy(msg.cmd,"puts",sizeof("puts"));
+    memcpy(msg.rst,fileName,strlen(fileName));
+    send(netfd,&msg,sizeof(msg),0);
+
+    train_t train;
+    bzero(&train,sizeof(train));
+
+    char absolutePath[2048]={0};
+    user_t *user = getUserByFd(&threadPool->userArr,netfd);
+    sprintf(absolutePath,"%s%s%s%s",threadPool->home,user->userName,user->userCwd,fileName);
+
+    int fd = open(absolutePath,O_RDWR|O_TRUNC|O_CREAT,0666);
+    while(1){
+        recv(netfd,&train,sizeof(train),MSG_WAITALL);
+        if(train.len == 0){
+            memcpy(msg.rst,"上传完成!OK",strlen("上传完成!OK"));
+            send(netfd,&msg,sizeof(msg),0);
+            break;
+        }
+        write(fd,train.data,train.len);
+        bzero(&train,sizeof(train));
     }
 }
 
