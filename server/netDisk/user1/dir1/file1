@@ -41,10 +41,11 @@ int checkCMD(threadPool_t *threadPool,char *str,int netfd){
     }
 }
 
-int handleGETS(const threadPool_t *threadPool,char *fileName,int netfd){
+int handleGETS(const threadPool_t *threadPool,const char *fileName,int netfd){
     rstMsg_t msg;
     bzero(&msg,sizeof(msg));
     memcpy(msg.cmd,"gets",sizeof("gets"));
+    memcpy(msg.rst,fileName,strlen(fileName));
 
     char absolutePath[2048]={0};
     user_t *user = getUserByFd(&threadPool->userArr,netfd);
@@ -68,21 +69,8 @@ int handleGETS(const threadPool_t *threadPool,char *fileName,int netfd){
         return -1;
     }
     msg.fileExit=1;
-    getFileNameByPath(fileName);
-    memcpy(msg.rst,fileName,strlen(fileName));
-    send(netfd,&msg,sizeof(msg),0);
-    transFile(absolutePath,netfd);
+    transFile(fileName,netfd);
 
-}
-void getFileNameByPath(char *path){
-    char *each;
-    char *str=path;
-    char *last;
-    while((each = strtok(str,"/"))!=NULL){
-        str=NULL;
-        last=each;
-    }
-    path=last;
 }
 
 int handleRM(const threadPool_t *threadPool,const char *fileName,int netfd){

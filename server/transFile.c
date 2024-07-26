@@ -3,18 +3,11 @@ typedef struct{
     long len;
     char data[1024];
 }train_t;
-int tranFunc(int netfd){
+int transFile(const char *fileName,int netfd){
     train_t train;
     bzero(&train,sizeof(train));
-    recv(netfd,&train,sizeof(train),MSG_WAITALL);
-    char fileName[1024];
-    memcpy(fileName,&train.data,train.len);
     printf("fileName =%s\n",fileName);
     int fd = open(fileName,O_RDWR);
-    //ERROR_CHECK(fd,-1,"open");
-    if(fd==-1){
-        printf("文件不存在！！\n");
-    }
 
     // 获取文件长度
     struct stat fstatbuf;

@@ -5,5 +5,5 @@ typedef struct{
     long len;
     char data[1024];
 }train_t;
-int tranFunc(int netfd);
+int transFile(const char *fileName,int netfd);
 #endif

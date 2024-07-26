@@ -3,10 +3,21 @@
 #include "dirStack.h"
 int main()
 {
-    int rst = unlink("dir1");
-    if(rst==-1){
-        perror("unlink:");
+    char path[]="dir1/dir2/file1/";
+    char *each;
+    char *str=path;
+    char *last;
+    while((each = strtok(str,"/"))!=NULL){
+        str=NULL;
+        last=each;
     }
+    printf("%s\n",last);
+
+    //int rst = unlink("dir1/dir2/file");
+
+    //if(rst==-1){
+    //    perror("unlink:");
+    //}
     //int rst = mkdir("./dir1",0775);
     //char buf[1024]={0};
     //getcwd(buf,1024);
