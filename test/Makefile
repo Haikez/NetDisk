@@ -4,9 +4,9 @@ OBJS:=$(patsubst %.c,%.o,$(SRCS))
 
 CC:=gcc
 $(OUT):$(OBJS)
-	$(CC) $^ -o $@
+	$(CC) $^ -o $@ -lcrypt
 %.o:%.c
 	$(CC) -c -g $^ -o $@ -pthread
 clean:
 	$(RM) $(OBJS) $(OUT)
-rebuild: clean main
+rebuild: clean test

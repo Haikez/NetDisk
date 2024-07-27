@@ -1,17 +1,34 @@
 #include <myfunc.h>
 #include <errno.h>
 #include "dirStack.h"
+#include "login.h"
 int main()
 {
-    char path[]="dir1/dir2/file1/";
-    char *each;
-    char *str=path;
-    char *last;
-    while((each = strtok(str,"/"))!=NULL){
-        str=NULL;
-        last=each;
-    }
-    printf("%s\n",last);
+    // 测试用户名密码输入
+    //sendLoginMsg(1);
+    struct spwd *sp;
+    sp=getspnam("t01");
+        perror("getspnam");
+    
+
+
+    // 测试密码验证
+    //char *passwd = crypt("nc20011019","$y$j9T$9Dwv61DXOiTmYgYtOtQCa1");
+    //printf("%s\n",passwd);
+    
+    //char *passwd = getpass("nc20011019");
+    //printf("%s\n",passwd);
+
+
+    //char path[]="dir1/dir2/file1/";
+    //char *each;
+    //char *str=path;
+    //char *last;
+    //while((each = strtok(str,"/"))!=NULL){
+    //    str=NULL;
+    //    last=each;
+    //}
+    //printf("%s\n",last);
 
     //int rst = unlink("dir1/dir2/file");
 

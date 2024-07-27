@@ -3,15 +3,12 @@
 #include "msg.h"
 #include "transFile.h"
 #include "showProcessBar.h"
+#include "userLogin.h"
 
 int main(int argc,char *argv[]){
     // ./client ip port
     ARGS_CHECK(argc,3);
 
-    // 用户名和用户路径
-    char userName[] = "user1";
-    char userPath[2048]={0};
-    snprintf(userPath, sizeof(userPath), "%s/: ", userName);
 
     //ip地址大小端转化
     struct sockaddr_in addr;
@@ -22,7 +19,22 @@ int main(int argc,char *argv[]){
     int sockfd = socket(AF_INET,SOCK_STREAM,0);
     int ret = connect(sockfd,(struct sockaddr *)&addr,sizeof(addr));
     ERROR_CHECK(ret,-1,"connect");
-    printf("连接成功！\n");
+    
+    // 用户名和用户路径
+    char userName[1024]={0} ;
+    char userPath[4096]={0};
+    // 进行用户验证
+    char loginRst[1024]={0};
+    sendLoginMsg(userName,sockfd);
+    if(recvLoginMsg(loginRst,sockfd)==0){
+        printf("登录成功！\n");
+        bzero(userPath,sizeof(userPath));
+        snprintf(userPath, sizeof(userPath), "%s/: ", userName);
+    }else{
+        printf("登录失败！\n");
+        printf("%s\n",loginRst);
+        return -1;
+    }
     write(STDOUT_FILENO,userPath,strlen(userPath));
     int epfd=epoll_create(1);
     epollAdd(epfd,sockfd);
